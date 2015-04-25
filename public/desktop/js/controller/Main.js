@@ -32,6 +32,6 @@ Main.prototype.play = function () {
     //To-Do
     this.render.draw();
 };
-
+    
 var main = new Main();
 main.play();

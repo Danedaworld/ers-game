@@ -6,11 +6,14 @@ module.exports = function (server) {
     io.on('connection', function (socket) {
         console.log('A user connected');
 
-        socket.on('leavePlayer', function(event) {
+        socket.on('leavePlayer', function (event) {
             console.log('A user disconnected');
         });
 
-        
+        socket.on('swipe', function (event) {
+            console.log('Swipe Event');
+            socket.emit('playCard');
+        });
 
 
     });

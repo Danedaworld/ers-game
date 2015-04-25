@@ -1,20 +1,56 @@
 #!/usr/bin/env node
 
+var clientIDs = [];
+var hostIDs = [];
+
 module.exports = function (server) {
     var io = require('socket.io').listen(server);
 
     io.on('connection', function (socket) {
-        console.log('A user connected');
+        //console.log('A user connected');
 
-        socket.on('leavePlayer', function (event) {
+        socket.on('joinPlayer', function (data) {
+            console.log('A new player has joined!');
+            io.emit('joinPlayer', {'name': 'Test', 'id': socket.id});
+            //socket.join('client');
+            clientIDs.push(socket.id);
+            console.log(clientIDs);
+        });
+
+        socket.on('joinHost', function (data) {
+            console.log('A host has joined!');
+            //socket.join('host');
+            io.emit('joinHost');
+            hostIDs.push(socket.id);
+        })
+
+        socket.on('disconnect', function (data) {
             console.log('A user disconnected');
+            console.log(socket.id);
+            var index = clientIDs.indexOf(socket.id);
+            console.log(index);
+            if (index !== -1) {
+                io.emit('leavePlayer', {'id': socket.id});
+                clientIDs.splice(index, index + 1);
+            } else {
+                index = hostIDs.indexOf(socket.id);
+                io.emit('leaveHost', {});
+                hostIDs.splice(index, index + 1);
+            }
         });
 
-        socket.on('swipe', function (event) {
-            console.log('Swipe Event');
-            socket.emit('playCard');
+        socket.on('playCard', function (data) {
+            console.log('Swipe event');
+            io.emit('playCard', {});
         });
 
+        socket.on('tap', function (data) {
+            console.log('Press Event');
+            io.emit('slap');
+        });
 
+        socket.on('noCardsRemaining', function (data) {
+            //To-Do
+        });
     });
-}
+};

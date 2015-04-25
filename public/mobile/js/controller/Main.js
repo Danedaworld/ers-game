@@ -6,7 +6,26 @@ var Main = function () {
 };
 
 Main.prototype.setupEvents = function () {
-    console.log($('#gameCanvas'));
+    var hammer = new Hammer($('#gameCanvas')[0]);
+
+    this.socket.emit('joinPlayer', {});
+
+    hammer.on('press', function (data) {
+        console.log('Pan up');
+        if (this.hand.playTopCard()) {
+            this.socket.emit('swipe');
+        } else {
+            this.socket.emit('noCardsRemaining');
+        }
+
+    }.bind(this));
+
+    hammer.on('tap', function (data) {
+        if (data.tapCount > 2) { 
+            console.log('Tap');
+            this.socket.emit('tap');
+        }
+    }.bind(this));
 
 };
 

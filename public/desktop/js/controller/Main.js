@@ -10,21 +10,25 @@ var Main = function () {
 Main.prototype.setupEvents = function () {
     // These are all temporary placeholders
 
-    this.socket.on('joinPlayer', function (event) {
+    this.socket.emit('joinHost', {});
+
+    this.socket.on('joinPlayer', function (data) {
         console.log('A new player has joined!');
-    });
+        this.ERS.addPlayer(data.name, data.id);
+    }.bind(this));
     
-    this.socket.on('leavePlayer', function (event) {
+    this.socket.on('leavePlayer', function (data) {
         console.log('A player has left!');
-    });
+        this.ERS.removePlayer(data.id);
+    }.bind(this));
 
-    this.socket.on('playCard', function (event) {
+    this.socket.on('playCard', function (data) {
         console.log('Play a card!');
-    });
+    }.bind(this));
 
-    this.socket.on('slap', function (event) {
+    this.socket.on('slap', function (data) {
         console.log('Slapped!');
-    });
+    }.bind(this));
 
 }
 

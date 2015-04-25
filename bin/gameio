@@ -2,10 +2,16 @@
 
 module.exports = function (server) {
     var io = require('socket.io').listen(server);
+
     io.on('connection', function (socket) {
         console.log('A user connected');
-        socket.on('disconnect', function() {
+
+        socket.on('leavePlayer', function(event) {
             console.log('A user disconnected');
         });
+
+        
+
+
     });
 }

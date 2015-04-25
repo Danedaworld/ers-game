@@ -17,7 +17,7 @@ Main.prototype.setupEvents = function () {
     this.socket.on('leavePlayer', function (event) {
         console.log('A player has left!');
     });
-    
+
     this.socket.on('playCard', function (event) {
         console.log('Play a card!');
     });

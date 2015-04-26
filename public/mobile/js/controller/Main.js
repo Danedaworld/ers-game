@@ -59,13 +59,14 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('slapResult', function (data) {
-        console.log('Slap result received!');
         if (data.result === 'penalty') {
+            console.log('Burn a card!');
             var card = this.hand.playCard();
             this.socket.emit('penaltyCard', card);
         } else if (data.result === null) {
             //do nothing
         } else if (data.result.length > 0) {
+            console.log('You get the pile!');
             this.hand.addCardPile(data.result);
         }
     }.bind(this));

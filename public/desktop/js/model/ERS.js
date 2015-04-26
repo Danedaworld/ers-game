@@ -1,5 +1,6 @@
 var ERS = function () {
-    this.board = []
+    this.cardPile = []
+    this.burnPile = []
     this.playerList = [];
     this.currentPlayer = null;
     this.slappers = [];
@@ -42,18 +43,22 @@ ERS.prototype.dealCards = function () {
     return cardPiles;
 };
 
-// Play a card onto the board
+// Play a card onto the cardPile
 ERS.prototype.playCard = function (card) {
-    this.cardList.push(card);
+    this.cardPile.push(card);
     this.checkGameState();
 };
 
-// Checks if the cards on the board can be slapped or not.
+ERS.prototype.burnCard = function (card) {
+    this.burnPile.push(card);
+}
+
+// Checks if the cards on the cardPile can be slapped or not.
 ERS.prototype.checkGameState = function () {
-    var size = this.cardList.length;
-    if (size > 1 && this.cardList[size - 1].value === this.cardList[size - 2].value) {
+    var size = this.cardPile.length;
+    if (size > 1 && this.cardPile[size - 1].value === this.cardPile[size - 2].value) {
         this.isSlappable = 1;
-    } else if (size > 2 && this.cardList[size - 1].value === this.cardList[size - 3].value) {
+    } else if (size > 2 && this.cardPile[size - 1].value === this.cardPile[size - 3].value) {
         this.isSlappable = 1;
     } else {
         this.isSlappable = -1;
@@ -65,8 +70,9 @@ ERS.prototype.checkGameState = function () {
 ERS.prototype.slap = function (id) {
     if (this.isSlappable === 1) {   // Winner of the slap
         this.isSlappable = 0;
-        var cardList = this.board;
-        this.board = [];
+        var cardList = this.cardPile.concat(this.burnPile);
+        this.cardPile = [];
+        this.burnPile = [];
         return {'result': cardList, 'id':id};
     } else if (this.isSlappable === 0) {   // Slaps are ignored
         return {'result': null, 'id':id};

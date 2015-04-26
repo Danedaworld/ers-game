@@ -13,7 +13,9 @@ module.exports = function (server) {
             console.log('A new player has joined!');
             io.emit('joinPlayer', {'name': data.name, 'id': socket.id});
             //socket.join('client');
-            clientIDs.push(socket.id);
+            if (clientIDs.indexOf(socket.id) === -1) {
+                clientIDs.push(socket.id);
+            }
             console.log(clientIDs);
         });
 
@@ -44,8 +46,24 @@ module.exports = function (server) {
             }
         });
 
+        socket.on('startGameRequest', function () {
+            console.log('The game requested to be started');
+            io.emit('startGameRequest', {});
+        });
+
+        socket.on('gameStarted', function () {
+            console.log('The game has begun!');
+            io.emit('gameStarted');
+        });
+
+        socket.on('gameCanBeStarted', function () {
+            console.log('The game can be started');
+            io.emit('gameCanBeStarted');
+        });
+
         socket.on('dealCards', function (data) {
             console.log('Dealing cards out');
+            console.log(data.id);
             io.to(data.id).emit('dealCards', data);
         });
 
@@ -57,7 +75,7 @@ module.exports = function (server) {
         socket.on('penaltyCard', function (data) {
             console.log('Penalty card event');
             io.emit('penaltyCard', data);
-        })
+        });
 
         socket.on('slap', function (data) {
             console.log('Press Event');
@@ -67,7 +85,7 @@ module.exports = function (server) {
         socket.on('slapResult', function (data) {
             console.log('Slap Results came back');
             io.to(data.id).emit('slapResult', data);
-        })
+        });
 
         socket.on('noCardsRemaining', function (data) {
             //To-Do

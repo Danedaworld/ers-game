@@ -7,7 +7,11 @@ var ERS = function () {
 };
 
 ERS.prototype.addPlayer = function (name, id) {
-    this.playerList.push(new window.Player(name, id));
+    var player = new Player(name, id);
+    console.log(player);
+    if (this.playerList.indexOf(player) === -1) {
+        this.playerList.push(player);
+    }
 };
 
 ERS.prototype.removePlayer = function (id) {

@@ -16,11 +16,22 @@ Main.prototype.setupEvents = function () {
         console.log('A new player has joined!');
         this.ERS.addPlayer(data.name, data.id);
         this.socket.emit('syncSuccess', {'id': data.id});
+        if (this.ERS.playerList.length > 1) {
+            console.log('The game can now be started!');
+            this.socket.emit('gameCanBeStarted');
+        }
     }.bind(this));
     
     this.socket.on('leavePlayer', function (data) {
         console.log('A player has left!');
         this.ERS.removePlayer(data.id);
+    }.bind(this));
+
+    this.socket.on('startGameRequest', function () {
+        console.log('Game has now begun!');
+        this.socket.emit('gameStarted');        
+        this.play();
+
     }.bind(this));
 
     this.socket.on('playCard', function (data) {

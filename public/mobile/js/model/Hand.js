@@ -30,5 +30,4 @@ Hand.prototype.addCardPile = function (pile) {
     }
 }
 
-
 window.Hand = Hand;

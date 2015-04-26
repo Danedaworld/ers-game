@@ -12,16 +12,16 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     $('#start').on('click', function () {
-        this.socket.emit('startGame', {});
+        this.socket.emit('startGameRequest', {});
     }.bind(this));
 
     // Gesture event handlers
     var hammer = new Hammer($('#gameCanvas')[0]);
     hammer.on('press', function (data) {
-        console.log('Pan up');
         var card = this.hand.playTopCard();
+        console.log(card);
         if (card) {
-            this.socket.emit('playCards', {'card': card});
+            this.socket.emit('playCard', {'card': card});
         } else {
             this.socket.emit('noCardsRemaining');
         }
@@ -41,12 +41,20 @@ Main.prototype.setupEvents = function () {
         console.log('Sync is successful.');
         this.isSynced = true;
         $('#syncStep').hide();
+        $('#start').prop('disabled', true);
         $('#startStep').show();
     }.bind(this));
 
+    this.socket.on('gameCanBeStarted', function () {
+        console.log('The game can now be started.');
+        $('#start').prop('disabled', false);
+    });
+
     this.socket.on('gameStarted', function () {
-        $('#start').hide();
+        console.log('The game has begun!');
+        $('#startStep').hide();
         $('#gameCanvas').show();
+        this.play();
 
     }.bind(this));
 
@@ -64,6 +72,7 @@ Main.prototype.setupEvents = function () {
 
     this.socket.on('dealCards', function (data) {
         console.log('Received dealt cards!');
+        console.log(data.cards);
         this.hand.addCardPile(data.cards);
     }.bind(this));
 

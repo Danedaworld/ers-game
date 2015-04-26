@@ -19,7 +19,7 @@ Main.prototype.setupEvents = function () {
 
     // Gesture event handlers
     var hammer = new Hammer($('#gameCanvas')[0]);
-    $('#gameCanvas').on('swipeup', function () {
+    hammer.on('swipeup', function () {
         var card = this.hand.playTopCard();
         console.log(card);
         if (card) {
@@ -30,7 +30,7 @@ Main.prototype.setupEvents = function () {
 
     }.bind(this));
 
-    $('#gameCanvas').on('swipedown', function (event) {
+    hammer.on('swipedown', function (event) {
         event.preventDefault();
     });
 

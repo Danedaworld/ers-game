@@ -35,7 +35,7 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('playCard', function (data) {
-        console.log('Play a card!');
+        console.log('Played a card!');
         this.ERS.board.addCard(data.card);
     }.bind(this));
 

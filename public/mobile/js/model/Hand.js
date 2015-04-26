@@ -13,7 +13,7 @@ Hand.prototype.playTopCard = function () {
 Hand.prototype.playCard = function (index) {
     index = index ? index : 0;
     var cardPos = this.cardList.length - 1 - index;
-    return this.cardList.splice(cardPos, 1);
+    return this.cardList.splice(cardPos, 1)[0];
 };
 
 Hand.prototype.addCard = function (card) {

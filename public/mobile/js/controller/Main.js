@@ -22,9 +22,11 @@ Main.prototype.setupEvents = function () {
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
     canvas.addEventListener('touchend', function (event) {
-        if (event.identifier === this.tapStart.event.identifier) {
+        if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
             var time = Date.now();
-            if (time - this.tapStart.time > 1000 && event.pageY - this.tapStart.event.pageY > 30) { // naive 'swipe' motion
+            var touch = event.changedTouches[0];
+            if (time - this.tapStart.time > 100 && this.tapStart.touch.pageY - touch.pageY > 100) { // naive 'swipe' motion
+                console.log('Swipe motion registered');
                 var card = this.hand.playTopCard();
                 console.log(card);
                 if (card) {
@@ -38,8 +40,9 @@ Main.prototype.setupEvents = function () {
 
 
     canvas.addEventListener('touchstart', function (event) {
+        console.log(event);
         if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
-            this.tapStart = {'time': Date.now(), 'event': event};
+            this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
         }
         if (event.targetTouches.length === 4) { // this should be a four-finger tap
             console.log('Tap');

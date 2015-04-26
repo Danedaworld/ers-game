@@ -19,7 +19,7 @@ Main.prototype.setupEvents = function () {
 
     // Gesture event handlers
     var hammer = new Hammer($('#gameCanvas')[0]);
-    hammer.on('panup', function (data) {
+    hammer.on('swipeup', function (data) {
         var card = this.hand.playTopCard();
         console.log(card);
         if (card) {

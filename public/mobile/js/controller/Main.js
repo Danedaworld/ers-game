@@ -19,7 +19,7 @@ Main.prototype.setupEvents = function () {
 
     // Gesture event handlers
     var hammer = new Hammer($('#gameCanvas')[0]);
-    hammer.on('press', function (data) {
+    hammer.on('panup', function (data) {
         var card = this.hand.playTopCard();
         console.log(card);
         if (card) {
@@ -31,7 +31,7 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     hammer.on('tap', function (data) {
-        if (data.tapCount > 2) { 
+        if (data.tapCount === 4) { 
             console.log('Tap');
             this.socket.emit('slap');
         }

@@ -1,5 +1,7 @@
 var Main = function () {
     this.hand = new window.Hand();
+    this.socket = io();
+    this.setupEvents();
     this.isSynced = false;
     this.canStart = false;
 };
@@ -82,8 +84,7 @@ Main.prototype.setupEvents = function () {
 Main.prototype.start = function () {
     $('#gameCanvas').hide();
     $('#startStep').hide();
-    this.socket = io();
-    this.setupEvents();
+
     //this.render.draw();        
 
 

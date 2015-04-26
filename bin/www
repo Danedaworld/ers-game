@@ -33,7 +33,7 @@ server.on('listening', onListening);
 /**
  * SocketIO initialization
  */
-var gameIO = require('../bin/GameIO')(server);
+var gameIO = require('./GameIO')(server);
 
 
 /**

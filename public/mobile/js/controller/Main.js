@@ -22,9 +22,9 @@ Main.prototype.setupEvents = function () {
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
     canvas.addEventListener('touchend', function (event) {
-        if (event.identifier === tapStart.event.identifier) {
+        if (event.identifier === this.tapStart.event.identifier) {
             var time = Date.now();
-            if (time - tapStart.time > 1000 && event.pageY - tapStart.event.pageY > 30) { // naive 'swipe' motion
+            if (time - this.tapStart.time > 1000 && event.pageY - this.tapStart.event.pageY > 30) { // naive 'swipe' motion
                 var card = this.hand.playTopCard();
                 console.log(card);
                 if (card) {

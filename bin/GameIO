@@ -21,7 +21,7 @@ module.exports = function (server) {
 
         socket.on('syncSuccess', function (data) {
             console.log('A sync has been successful');
-            io.to(data.id).emit('syncSuccess', {});
+            io.to(data.id).emit('syncSuccess', {'id': data.id});
         });
 
         socket.on('joinHost', function (data) {
@@ -61,10 +61,10 @@ module.exports = function (server) {
             io.emit('gameCanBeStarted');
         });
 
-        socket.on('dealCards', function (data) {
-            console.log('Dealing cards out');
+        socket.on('giveCards', function (data) {
+            console.log('Giving cards');
             console.log(data.id);
-            io.to(data.id).emit('dealCards', data);
+            io.to(data.id).emit('giveCards', data);
         });
 
         socket.on('playCard', function (data) {

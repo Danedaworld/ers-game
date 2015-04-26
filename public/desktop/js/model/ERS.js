@@ -3,6 +3,10 @@ var ERS = function () {
     this.burnPile = []
     this.playerList = [];
     this.currentPlayer = null;
+    this.currentPlayerIndex = -1;
+    this.numCardsToPlay = 1;
+    this.isFaceCard = false;
+    this.faceCardPlayer = null;
     this.slappers = [];
     this.isSlappable = 0;
 };
@@ -22,7 +26,7 @@ ERS.prototype.removePlayer = function (id) {
 
 ERS.prototype.getPlayerByID = function (id) {
     for (var i = 0; i < this.playerList.length; i++) {
-        if (this.playerList.id === id) {
+        if (this.playerList[i].id === id) {
             return i;
         }
     }
@@ -44,9 +48,10 @@ ERS.prototype.dealCards = function () {
 };
 
 // Play a card onto the cardPile
-ERS.prototype.playCard = function (card) {
+ERS.prototype.playCard = function (card, id) {
     this.cardPile.push(card);
-    this.checkGameState();
+    this.numCardsToPlay--;
+    return this.checkGameState(id);
 };
 
 ERS.prototype.burnCard = function (card) {
@@ -54,25 +59,73 @@ ERS.prototype.burnCard = function (card) {
 }
 
 // Checks if the cards on the cardPile can be slapped or not.
-ERS.prototype.checkGameState = function () {
+ERS.prototype.checkGameState = function (id) {
     var size = this.cardPile.length;
-    if (size > 1 && this.cardPile[size - 1].value === this.cardPile[size - 2].value) {
+    var topCard = this.cardPile[size - 1];
+    if (size > 1 && topCard.value === this.cardPile[size - 2].value) {
         this.isSlappable = 1;
     } else if (size > 2 && this.cardPile[size - 1].value === this.cardPile[size - 3].value) {
         this.isSlappable = 1;
     } else {
         this.isSlappable = -1;
     }
+    if (topCard.value === 'J') {
+        this.faceCardPlayer = this.currentPlayer;
+        this.numCardsToPlay = 1;
+        this.isFaceCard = true;
+    } else if (topCard.value === 'Q') {
+        this.faceCardPlayer = this.currentPlayer;
+        this.numCardsToPlay = 2;
+        this.isFaceCard = true;
+
+    } else if (topCard.value === 'K') {
+        this.faceCardPlayer = this.currentPlayer;
+        this.numCardsToPlay = 3;
+        this.isFaceCard = true;
+    } else if (topCard.value === 'A') {
+        this.faceCardPlayer = this.currentPlayer;
+        this.numCardsToPlay = 4;
+        this.isFaceCard = true;
+    }
+
+    if (this.isFaceCard && this.numCardsToPlay === 0) {
+        var cardList = this.cardPile.concat(this.burnPile);
+        this.cardPile = [];
+        this.burnPile = [];
+        this.setCurrentPlayer(id);
+
+        return {'result': cardList, 'id':id}
+    }
+
 }
 
+ERS.prototype.setStartingPlayer = function () {
+    this.currentPlayerIndex = this.playerList.length * Math.random()
+    this.currentPlayer = this.playerList[this.currentPlayerIndex];
+}
+
+ERS.prototype.nextPlayer = function () {
+    if (this.numCardsToPlay === 0) {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
+        this.currentPlayer = this.playerList[this.currentPlayerIndex];
+        this.numCardsToPlay = 1;
+    }
+    return this.currentPlayer;
+}
+
+ERS.prototype.setCurrentPlayer = function (id) {
+    this.currentPlayer = this.getPlayerByID(id);
+    this.currentPlayerIndex = this.playerList.indexOf(this.currentPlayer);
+}
 
 // Slap the cards on the board
 ERS.prototype.slap = function (id) {
     if (this.isSlappable === 1) {   // Winner of the slap
         this.isSlappable = 0;
-        var cardList = this.cardPile.concat(this.burnPile);
-        this.cardPile = [];
+        var cardList = this.cardPile.concat(this.burnPile); // combine burn + board card piles
+        this.cardPile = []; // reset those piles
         this.burnPile = [];
+        this.setCurrentPlayer(id);
         return {'result': cardList, 'id':id};
     } else if (this.isSlappable === 0) {   // Slaps are ignored
         return {'result': null, 'id':id};

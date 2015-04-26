@@ -4,6 +4,7 @@ var Main = function () {
     this.setupEvents();
     this.isSynced = false;
     this.canStart = false;
+    this.isMyTurn = false;
     this.tapStart = {};
 };
 
@@ -22,17 +23,19 @@ Main.prototype.setupEvents = function () {
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
     canvas.addEventListener('touchend', function (event) {
-        if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
-            var time = Date.now();
-            var touch = event.changedTouches[0];
-            if (time - this.tapStart.time > 100 && this.tapStart.touch.pageY - touch.pageY > 100) { // naive 'swipe' motion
-                console.log('Swipe motion registered');
-                var card = this.hand.playTopCard();
-                console.log(card);
-                if (card) {
-                    this.socket.emit('playCard', {'card': card});
-                } else {
-                    this.socket.emit('noCardsRemaining');
+        if (isMyTurn) {
+            if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
+                var time = Date.now();
+                var touch = event.changedTouches[0];
+                if (time - this.tapStart.time > 100 && this.tapStart.touch.pageY - touch.pageY > 100) { // naive 'swipe' motion
+                    console.log('Swipe motion registered');
+                    var card = this.hand.playTopCard();
+                    console.log(card);
+                    if (card) {
+                        this.socket.emit('playCard', {'card': card});
+                    } else {
+                        this.socket.emit('noCardsRemaining');
+                    }
                 }
             }
         }
@@ -40,21 +43,24 @@ Main.prototype.setupEvents = function () {
 
 
     canvas.addEventListener('touchstart', function (event) {
-        console.log(event);
-        if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
-            this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
-        }
-        if (event.targetTouches.length === 4) { // this should be a four-finger tap
-            console.log('Tap');
-            this.socket.emit('slap');
+        if (isMyTurn) {
+            console.log(event);
+            if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
+                this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
+            }
+            if (event.targetTouches.length === 4) { // this should be a four-finger tap
+                console.log('Tap');
+                this.socket.emit('slap');
+            }
         }
     }.bind(this));
 
     // Socket event handlers
 
-    this.socket.on('syncSuccess', function () {
+    this.socket.on('syncSuccess', function (data) {
         console.log('Sync is successful.');
         this.isSynced = true;
+        this.id = data.id;
         $('#syncStep').hide();
         $('#start').prop('disabled', true);
         $('#startStep').show();
@@ -73,13 +79,23 @@ Main.prototype.setupEvents = function () {
 
     }.bind(this));
 
+    this.socket.on('nextPlayer', function (data) {
+        console.log('It is ' + data.id + ' turn.');
+        if (data.id === this.id) {
+            this.isMyTurn = true;
+
+        } else {
+            this.isMyTurn = false;
+        }
+    }.bind(this));
+
     this.socket.on('slapResult', function (data) {
         if (data.result === 'penalty') {
             console.log('Burn a card!');
             var card = this.hand.playCard();
             this.socket.emit('penaltyCard', card);
         } else if (data.result === null) {
-            //do nothing
+            
         } else if (data.result.length > 0) {
             console.log('You get the pile!');
             this.hand.addCardPile(data.result);

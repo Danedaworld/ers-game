@@ -35,8 +35,12 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('playCard', function (data) {
-        console.log('Played a card!');
-        this.ERS.playCard(data.card);
+        console.log('Played a card!' + data.card.value + ' ' + data.card.suite);
+        var result = this.ERS.playCard(data.card, data.id);
+        var result = result ? result : [];
+        setTimeout(this.socket.emit('giveCards', result), 500);
+        var nextPlayer = this.ERS.nextPlayer();
+        this.socket.emit('nextPlayer', {'id':nextPlayer.id});
     }.bind(this));
 
     this.socket.on('penaltyCard', function (data) {
@@ -48,6 +52,8 @@ Main.prototype.setupEvents = function () {
         console.log('Slapped!');
         var result = this.ERS.slap(data.id);
         this.socket.emit('slapResult', result);
+        var nextPlayer = this.ERS.nextPlayer();
+        this.socket.emit('nextPlayer', {'id':nextPlayer.id});
     }.bind(this));
 };
 
@@ -59,8 +65,10 @@ Main.prototype.play = function () {
     //To-Do
     var piles = this.ERS.dealCards();
     for (var i = 0; i < piles.length; i++) {
-        this.socket.emit('dealCards', {'id': this.ERS.playerList[i].id, 'cards': piles[i]});
+        this.socket.emit('giveCards', {'id': this.ERS.playerList[i].id, 'cards': piles[i]});
     }
+    this.ERS.setStartingPlayer();
+    this.
 };
     
 var main = new Main();

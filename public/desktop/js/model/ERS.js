@@ -1,5 +1,5 @@
 var ERS = function () {
-    this.board = new Board();
+    this.board = []
     this.playerList = [];
     this.currentPlayer = null;
     this.slappers = [];
@@ -42,10 +42,32 @@ ERS.prototype.dealCards = function () {
     return cardPiles;
 };
 
+// Play a card onto the board
+ERS.prototype.playCard = function (card) {
+    this.cardList.push(card);
+    this.checkGameState();
+};
+
+// Checks if the cards on the board can be slapped or not.
+ERS.prototype.checkGameState = function () {
+    var size = this.cardList.length;
+    if (size > 1 && this.cardList[size - 1].value === this.cardList[size - 2].value) {
+        this.isSlappable = 1;
+    } else if (size > 2 && this.cardList[size - 1].value === this.cardList[size - 3].value) {
+        this.isSlappable = 1;
+    } else {
+        this.isSlappable = -1;
+    }
+}
+
+
+// Slap the cards on the board
 ERS.prototype.slap = function (id) {
     if (this.isSlappable === 1) {   // Winner of the slap
         this.isSlappable = 0;
-        return {'result': this.board.getCardList(), 'id':id};
+        var cardList = this.board;
+        this.board = [];
+        return {'result': cardList, 'id':id};
     } else if (this.isSlappable === 0) {   // Slaps are ignored
         return {'result': null, 'id':id};
     } else {   // Burn use

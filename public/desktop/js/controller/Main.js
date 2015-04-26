@@ -36,18 +36,19 @@ Main.prototype.setupEvents = function () {
 
     this.socket.on('playCard', function (data) {
         console.log('Played a card!');
-        this.ERS.board.addCard(data.card);
+        this.ERS.addCard(data.card);
     }.bind(this));
 
     this.socket.on('penaltyCard', function (data) {
         console.log('Penalized a card!');
-        this.ERS.board.addCardToBottom(data);
+        this.ERS.addCardToBottom(data);
     }.bind(this));
 
     this.socket.on('slap', function (data) {
         console.log('Slapped!');
         var result = this.ERS.slap(data.id);
-        this.socket.emit('slapResponse', result);
+        this.socket.emit('slapResult', result);
+        this.ERS.clearBoard();
     }.bind(this));
 };
 

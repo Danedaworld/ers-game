@@ -4,6 +4,7 @@ var Main = function () {
     this.setupEvents();
     this.isSynced = false;
     this.canStart = false;
+    this.tapStart = {};
 };
 
 Main.prototype.setupEvents = function () {
@@ -17,25 +18,30 @@ Main.prototype.setupEvents = function () {
         this.socket.emit('startGameRequest', {});
     }.bind(this));
 
-    // Gesture event handlers
-    var hammer = new Hammer($('#gameCanvas')[0]);
-    hammer.on('swipeup', function () {
-        var card = this.hand.playTopCard();
-        console.log(card);
-        if (card) {
-            this.socket.emit('playCard', {'card': card});
-        } else {
-            this.socket.emit('noCardsRemaining');
+    // Gesture event handlers (I tried JQuery/Hammer and decided to just write my own custom events)
+    var hammer = new Hammer($('#gameCanvas')[0]); 
+    var canvas = $('#gameCanvas')[0];
+    canvas.addEventListener('touchend', function (event) {
+        if (event.identifier === tapStart.event.identifier) {
+            var time = Date.now();
+            if (time - tapStart.time > 1000 && event.pageY - tapStart.event.pageY > 30) { // naive 'swipe' motion
+                var card = this.hand.playTopCard();
+                console.log(card);
+                if (card) {
+                    this.socket.emit('playCard', {'card': card});
+                } else {
+                    this.socket.emit('noCardsRemaining');
+                }
+            }
         }
-
     }.bind(this));
 
-    hammer.on('swipedown', function (event) {
-        event.preventDefault();
-    });
 
-    hammer.on('tap', function (data) {
-        if (data.tapCount === 4) { 
+    canvas.addEventListener('touchstart', function (event) {
+        if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
+            this.tapStart = {'time': Date.now(), 'event': event};
+        }
+        if (event.targetTouches.length === 4) { // this should be a four-finger tap
             console.log('Tap');
             this.socket.emit('slap');
         }

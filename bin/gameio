@@ -11,10 +11,15 @@ module.exports = function (server) {
 
         socket.on('joinPlayer', function (data) {
             console.log('A new player has joined!');
-            io.emit('joinPlayer', {'name': 'Test', 'id': socket.id});
+            io.emit('joinPlayer', {'name': data.name, 'id': socket.id});
             //socket.join('client');
             clientIDs.push(socket.id);
             console.log(clientIDs);
+        });
+
+        socket.on('syncSuccess', function (data) {
+            console.log('A sync has been successful');
+            io.to(data.id).emit('syncSuccess', {});
         });
 
         socket.on('joinHost', function (data) {
@@ -31,23 +36,38 @@ module.exports = function (server) {
             console.log(index);
             if (index !== -1) {
                 io.emit('leavePlayer', {'id': socket.id});
-                clientIDs.splice(index, index + 1);
+                clientIDs.splice(index, 1);
             } else {
                 index = hostIDs.indexOf(socket.id);
                 io.emit('leaveHost', {});
-                hostIDs.splice(index, index + 1);
+                hostIDs.splice(index, 1);
             }
         });
 
-        socket.on('playCard', function (data) {
-            console.log('Swipe event');
-            io.emit('playCard', {});
+        socket.on('dealCards', function (data) {
+            console.log('Dealing cards out');
+            io.to(data.id).emit('dealCards', data);
         });
 
-        socket.on('tap', function (data) {
-            console.log('Press Event');
-            io.emit('slap');
+        socket.on('playCard', function (data) {
+            console.log('Play card event');
+            io.emit('playCard', {'card': data.card});
         });
+
+        socket.on('penaltyCard', function (data) {
+            console.log('Penalty card event');
+            io.emit('penaltyCard', data);
+        })
+
+        socket.on('slap', function (data) {
+            console.log('Press Event');
+            io.emit('slap', {'id': socket.id});
+        });
+
+        socket.on('slapResult', function (data) {
+            console.log('Slap Results came back');
+            io.to(data.id).emit('slapResult', data);
+        })
 
         socket.on('noCardsRemaining', function (data) {
             //To-Do

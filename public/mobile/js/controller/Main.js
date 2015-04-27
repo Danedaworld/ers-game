@@ -64,7 +64,8 @@ Main.prototype.setupEvents = function () {
             this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
         }
         if (event.targetTouches.length === 4) { // this should be a four-finger tap
-            console.log('Tap');
+            console.log('SLAP!');
+            this.isMyTurn = false;
             this.socket.emit('slap');
         }
     }.bind(this));
@@ -111,13 +112,14 @@ Main.prototype.setupEvents = function () {
             console.log('Burn a card!');
             var card = this.hand.playCard();
             this.socket.emit('penaltyCard', card);
-            this.render.draw('#FF0000')
+            this.render.draw('#FF0000');
         } else if (data.result === null) {
-            
+            this.render.draw();
         } else if (data.result.length > 0) {
             console.log('You get the pile!');
             this.hand.addCardPile(data.result);
             this.render.draw('#6ABEFA');
+
         }
     }.bind(this));
 

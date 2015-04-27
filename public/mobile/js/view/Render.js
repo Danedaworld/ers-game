@@ -11,12 +11,13 @@ Render.prototype.setupCanvas = function () {
     this.canvas.height = window.innerHeight;
 };
 
-Render.prototype.draw = function () {
+Render.prototype.draw = function (color) {
     // Render board
     // this.ctx.fillStyle = '#BFB64D';
     // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    color = color ? color : '#BFB64D';
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    $('#gameCanvas').css('background-color', '#BFB64D');
+    $('#gameCanvas').css('background-color', color);
     // Draw hand
     
 

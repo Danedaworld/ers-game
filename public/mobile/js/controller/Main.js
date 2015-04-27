@@ -21,6 +21,14 @@ Main.prototype.setupEvents = function () {
         this.socket.emit('startGameRequest', {});
     }.bind(this));
 
+    // stupid iPhones...
+    document.ontouchstart = function (e) {
+        e.preventDefault();
+    }
+    document.ontouchmove = function (e) {
+        e.preventDefault();
+    }
+
     // Gesture event handlers (I tried JQuery/Hammer and decided to just write my own custom events)
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
@@ -29,7 +37,7 @@ Main.prototype.setupEvents = function () {
             if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
                 var time = Date.now();
                 var touch = event.changedTouches[0];
-                if (time - this.tapStart.time > 100 && this.tapStart.touch.pageY - touch.pageY > 100) { // naive 'swipe' motion
+                if (time - this.tapStart.time > 50 && this.tapStart.touch.pageY - touch.pageY > 50) { // naive 'swipe' motion
                     console.log('Swipe motion registered');
                     var card = this.hand.playTopCard();
                     console.log(card);
@@ -91,6 +99,7 @@ Main.prototype.setupEvents = function () {
         if (data.id === this.id) {
             console.log('It is my turn');
             this.isMyTurn = true;
+            this.render.draw('#EAFF00');
         } else {
             console.log('It is ' + data.id + ' turn.');
             this.isMyTurn = false;
@@ -102,11 +111,13 @@ Main.prototype.setupEvents = function () {
             console.log('Burn a card!');
             var card = this.hand.playCard();
             this.socket.emit('penaltyCard', card);
+            this.render.draw('#FF0000')
         } else if (data.result === null) {
             
         } else if (data.result.length > 0) {
             console.log('You get the pile!');
             this.hand.addCardPile(data.result);
+            this.render.draw('#6ABEFA');
         }
     }.bind(this));
 
@@ -114,7 +125,7 @@ Main.prototype.setupEvents = function () {
         console.log('Received cards!');
         console.log(data.cards);
         this.hand.addCardPile(data.cards);
-        this.render.draw();
+        this.render.draw('#6ABEFA');
     }.bind(this));
 
     this.socket.on('render', function (data) {

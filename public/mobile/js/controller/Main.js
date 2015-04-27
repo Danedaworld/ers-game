@@ -48,6 +48,7 @@ Main.prototype.setupEvents = function () {
 
     canvas.addEventListener('touchstart', function (event) {
         console.log(event);
+        event.preventDefault();
         // if (this.isPlaying === 0) {
         //     return;
         // }

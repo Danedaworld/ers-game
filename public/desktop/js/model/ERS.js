@@ -49,6 +49,7 @@ ERS.prototype.dealCards = function () {
 
 // Play a card onto the cardPile
 ERS.prototype.playCard = function (card, id) {
+    console.log(card);
     this.cardPile.push(card);
     this.numCardsToPlay--;
     return this.checkGameState(id);
@@ -92,24 +93,25 @@ ERS.prototype.checkGameState = function (id) {
         var cardList = this.cardPile.concat(this.burnPile);
         this.cardPile = [];
         this.burnPile = [];
-        this.setCurrentPlayer(id);
-
-        return {'result': cardList, 'id':id}
+        this.setCurrentPlayer(this.faceCardPlayer.id);
+        return {'result': cardList, 'id':this.faceCardPlayer.id}
     }
+
+    this.nextPlayer();
 
 }
 
 ERS.prototype.setStartingPlayer = function () {
-    this.currentPlayerIndex = this.playerList.length * Math.random()
+    this.currentPlayerIndex = Math.floor(this.playerList.length * Math.random());
     this.currentPlayer = this.playerList[this.currentPlayerIndex];
 }
 
 ERS.prototype.nextPlayer = function () {
-    if (this.numCardsToPlay === 0) {
-        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
-        this.currentPlayer = this.playerList[this.currentPlayerIndex];
-        this.numCardsToPlay = 1;
-    }
+
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
+    this.currentPlayer = this.playerList[this.currentPlayerIndex];
+    this.numCardsToPlay = 1;
+
     return this.currentPlayer;
 }
 

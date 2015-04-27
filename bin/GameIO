@@ -72,6 +72,11 @@ module.exports = function (server) {
             io.emit('playCard', {'card': data.card});
         });
 
+        socket.on('nextPlayer', function (data) {
+            console.log('Next Player');
+            io.emit('nextPlayer', data);
+        });
+
         socket.on('penaltyCard', function (data) {
             console.log('Penalty card event');
             io.emit('penaltyCard', data);

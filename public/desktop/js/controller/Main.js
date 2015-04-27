@@ -37,10 +37,10 @@ Main.prototype.setupEvents = function () {
     this.socket.on('playCard', function (data) {
         console.log('Played a card!' + data.card.value + ' ' + data.card.suite);
         var result = this.ERS.playCard(data.card, data.id);
-        var result = result ? result : [];
-        setTimeout(this.socket.emit('giveCards', result), 500);
-        var nextPlayer = this.ERS.nextPlayer();
-        this.socket.emit('nextPlayer', {'id':nextPlayer.id});
+        if (result) {
+            setTimeout(this.socket.emit('giveCards', result), 500);
+        }
+        this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id}); // the currentPlayer is set to the next player
     }.bind(this));
 
     this.socket.on('penaltyCard', function (data) {
@@ -52,14 +52,13 @@ Main.prototype.setupEvents = function () {
         console.log('Slapped!');
         var result = this.ERS.slap(data.id);
         this.socket.emit('slapResult', result);
-        var nextPlayer = this.ERS.nextPlayer();
-        this.socket.emit('nextPlayer', {'id':nextPlayer.id});
+        this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id});
     }.bind(this));
 };
 
 Main.prototype.start = function () {
     this.render.draw();
-}
+};
 
 Main.prototype.play = function () {
     //To-Do
@@ -68,7 +67,7 @@ Main.prototype.play = function () {
         this.socket.emit('giveCards', {'id': this.ERS.playerList[i].id, 'cards': piles[i]});
     }
     this.ERS.setStartingPlayer();
-    this.
+    this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id})
 };
     
 var main = new Main();

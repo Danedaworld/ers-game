@@ -23,7 +23,7 @@ Main.prototype.setupEvents = function () {
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
     canvas.addEventListener('touchend', function (event) {
-        if (isMyTurn) {
+        if (this.isMyTurn) {
             if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
                 var time = Date.now();
                 var touch = event.changedTouches[0];
@@ -43,7 +43,7 @@ Main.prototype.setupEvents = function () {
 
 
     canvas.addEventListener('touchstart', function (event) {
-        if (isMyTurn) {
+        if (this.isMyTurn) {
             console.log(event);
             if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
                 this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
@@ -102,7 +102,7 @@ Main.prototype.setupEvents = function () {
         }
     }.bind(this));
 
-    this.socket.on('dealCards', function (data) {
+    this.socket.on('giveCards', function (data) {
         console.log('Received dealt cards!');
         console.log(data.cards);
         this.hand.addCardPile(data.cards);

@@ -1,5 +1,6 @@
 var Main = function () {
-    this.hand = new window.Hand();
+    this.hand = new Hand();
+    this.render = new Render(this.hand);
     this.socket = io();
     this.setupEvents();
     this.isSynced = false;
@@ -33,6 +34,7 @@ Main.prototype.setupEvents = function () {
                     console.log(card);
                     if (card) {
                         this.socket.emit('playCard', {'card': card});
+                        this.render.draw();
                     } else {
                         this.socket.emit('noCardsRemaining');
                     }
@@ -43,15 +45,13 @@ Main.prototype.setupEvents = function () {
 
 
     canvas.addEventListener('touchstart', function (event) {
-        if (this.isMyTurn) {
-            console.log(event);
-            if (event.targetTouches.length === 1) { // this should be a single-finger swipe event
-                this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
-            }
-            if (event.targetTouches.length === 4) { // this should be a four-finger tap
-                console.log('Tap');
-                this.socket.emit('slap');
-            }
+        console.log(event);
+        if (event.targetTouches.length === 1 && this.isMyTurn) { // this should be a single-finger swipe event
+            this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
+        }
+        if (event.targetTouches.length === 4) { // this should be a four-finger tap
+            console.log('Tap');
+            this.socket.emit('slap');
         }
     }.bind(this));
 
@@ -72,10 +72,12 @@ Main.prototype.setupEvents = function () {
     });
 
     this.socket.on('gameStarted', function () {
-        console.log('The game has begun!');
-        $('#startStep').hide();
-        $('#gameCanvas').show();
-        this.play();
+        if (this.isSynced) {
+            console.log('The game has begun!');
+            $('#startStep').hide();
+            $('#gameCanvas').show();
+            this.play();
+        }
 
     }.bind(this));
 
@@ -106,6 +108,11 @@ Main.prototype.setupEvents = function () {
         console.log('Received cards!');
         console.log(data.cards);
         this.hand.addCardPile(data.cards);
+        this.render.draw();
+    }.bind(this));
+
+    this.socket.on('render', function (data) {
+        this.render.draw();
     }.bind(this));
 
 };
@@ -120,7 +127,7 @@ Main.prototype.start = function () {
 }
 
 Main.prototype.play = function () {
-    this.render = new window.Render(this.hand);
+    this.render.draw();
 };
 
 var main = new Main();

@@ -66,31 +66,37 @@ module.exports = function (server) {
             console.log(data.id);
             console.log(data);
             io.to(data.id).emit('giveCards', data);
+            // io.emit('render');
         });
 
         socket.on('playCard', function (data) {
             console.log('Play card event');
             io.emit('playCard', {'card': data.card});
+            // io.emit('render');
         });
 
         socket.on('nextPlayer', function (data) {
             console.log('Next Player');
             io.emit('nextPlayer', data);
+            // io.emit('render');
         });
 
         socket.on('penaltyCard', function (data) {
             console.log('Penalty card event');
             io.emit('penaltyCard', data);
+            // io.emit('render');
         });
 
         socket.on('slap', function (data) {
             console.log('Press Event');
             io.emit('slap', {'id': socket.id});
+            // io.emit('render');
         });
 
         socket.on('slapResult', function (data) {
             console.log('Slap Results came back');
             io.to(data.id).emit('slapResult', data);
+            // io.emit('render');
         });
 
         socket.on('noCardsRemaining', function (data) {

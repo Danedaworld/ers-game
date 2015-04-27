@@ -36,6 +36,7 @@ Main.prototype.setupEvents = function () {
 
     this.socket.on('playCard', function (data) {
         console.log('Played ' + data.card.value + ' ' + data.card.suite);
+        this.render.playCard(data.card);
         var result = this.ERS.playCard(data.card, data.id);
         if (result) {
             setTimeout(this.socket.emit('giveCards', result), 500);
@@ -46,6 +47,7 @@ Main.prototype.setupEvents = function () {
     this.socket.on('penaltyCard', function (data) {
         console.log('Penalized a card!');
         this.ERS.burnCard(data);
+        this.render.burnCard(data);
     }.bind(this));
 
     this.socket.on('slap', function (data) {
@@ -54,9 +56,17 @@ Main.prototype.setupEvents = function () {
         this.socket.emit('slapResult', result);
         if (result === 'penalty') {
             console.log('BURN A CARD!');
+        } else if (result) {
+            this.render.clearBoard();
         }
         this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id});
     }.bind(this));
+
+    this.socket.on('render', function (data) {
+        this.render.draw();
+    }.bind(this));
+
+
 };
 
 Main.prototype.start = function () {

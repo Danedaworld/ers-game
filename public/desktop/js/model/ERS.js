@@ -27,7 +27,7 @@ ERS.prototype.removePlayer = function (id) {
 ERS.prototype.getPlayerByID = function (id) {
     for (var i = 0; i < this.playerList.length; i++) {
         if (this.playerList[i].id === id) {
-            return i;
+            return this.playerList[i];
         }
     }
     return null;
@@ -52,7 +52,7 @@ ERS.prototype.playCard = function (card, id) {
     console.log(card);
     this.cardPile.push(card);
     this.numCardsToPlay--;
-    return this.checkGameState(id);
+    return this.checkGameState(card, id);
 };
 
 ERS.prototype.burnCard = function (card) {
@@ -60,9 +60,9 @@ ERS.prototype.burnCard = function (card) {
 }
 
 // Checks if the cards on the cardPile can be slapped or not.
-ERS.prototype.checkGameState = function (id) {
+ERS.prototype.checkGameState = function (card, id) {
     var size = this.cardPile.length;
-    var topCard = this.cardPile[size - 1];
+    var topCard = card;
     if (size > 1 && topCard.value === this.cardPile[size - 2].value) {
         this.isSlappable = 1;
     } else if (size > 2 && this.cardPile[size - 1].value === this.cardPile[size - 3].value) {
@@ -73,30 +73,34 @@ ERS.prototype.checkGameState = function (id) {
     if (topCard.value === 'J') {
         this.faceCardPlayer = this.currentPlayer;
         this.numCardsToPlay = 1;
+        this.forceNextPlayer();
         this.isFaceCard = true;
     } else if (topCard.value === 'Q') {
         this.faceCardPlayer = this.currentPlayer;
         this.numCardsToPlay = 2;
+        this.forceNextPlayer();
         this.isFaceCard = true;
-
     } else if (topCard.value === 'K') {
         this.faceCardPlayer = this.currentPlayer;
         this.numCardsToPlay = 3;
+        this.forceNextPlayer();
         this.isFaceCard = true;
     } else if (topCard.value === 'A') {
         this.faceCardPlayer = this.currentPlayer;
         this.numCardsToPlay = 4;
+        this.forceNextPlayer();
         this.isFaceCard = true;
-    }
-
-    if (this.isFaceCard && this.numCardsToPlay === 0) {
+    } else if (this.isFaceCard && this.numCardsToPlay === 0) {
         var cardList = this.cardPile.concat(this.burnPile);
         this.cardPile = [];
         this.burnPile = [];
         this.setCurrentPlayer(this.faceCardPlayer.id);
-        return {'result': cardList, 'id':this.faceCardPlayer.id}
+        this.isFaceCard = false;
+        return {'cards': cardList, 'id':this.faceCardPlayer.id}
     }
-
+    if (this.numCardsToPlay === 0) {
+        this.isFaceCard = false;
+    }
     this.nextPlayer();
 
 }
@@ -106,12 +110,19 @@ ERS.prototype.setStartingPlayer = function () {
     this.currentPlayer = this.playerList[this.currentPlayerIndex];
 }
 
-ERS.prototype.nextPlayer = function () {
-
+ERS.prototype.forceNextPlayer = function () {
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
     this.currentPlayer = this.playerList[this.currentPlayerIndex];
-    this.numCardsToPlay = 1;
+}
 
+ERS.prototype.nextPlayer = function () {
+    if (!this.isFaceCard) {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
+        this.currentPlayer = this.playerList[this.currentPlayerIndex];
+        if (this.numCardsToPlay === 0) {
+            this.numCardsToPlay = 1; 
+        }
+    }
     return this.currentPlayer;
 }
 

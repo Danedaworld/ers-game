@@ -80,11 +80,11 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('nextPlayer', function (data) {
-        console.log('It is ' + data.id + ' turn.');
         if (data.id === this.id) {
+            console.log('It is my turn');
             this.isMyTurn = true;
-
         } else {
+            console.log('It is ' + data.id + ' turn.');
             this.isMyTurn = false;
         }
     }.bind(this));
@@ -103,7 +103,7 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('giveCards', function (data) {
-        console.log('Received dealt cards!');
+        console.log('Received cards!');
         console.log(data.cards);
         this.hand.addCardPile(data.cards);
     }.bind(this));

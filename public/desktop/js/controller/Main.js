@@ -35,7 +35,7 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     this.socket.on('playCard', function (data) {
-        console.log('Played a card!' + data.card.value + ' ' + data.card.suite);
+        console.log('Played ' + data.card.value + ' ' + data.card.suite);
         var result = this.ERS.playCard(data.card, data.id);
         if (result) {
             setTimeout(this.socket.emit('giveCards', result), 500);

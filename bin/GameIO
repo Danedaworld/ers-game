@@ -64,6 +64,7 @@ module.exports = function (server) {
         socket.on('giveCards', function (data) {
             console.log('Giving cards');
             console.log(data.id);
+            console.log(data);
             io.to(data.id).emit('giveCards', data);
         });
 

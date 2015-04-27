@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 
-router.get('/mobile', function(req, res, next) {
+router.get('/m', function(req, res, next) {
     res.render('m_index', { title: 'Express' });
 });
 /* GET home page. */

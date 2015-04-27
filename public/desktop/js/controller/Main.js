@@ -58,9 +58,9 @@ Main.prototype.setupEvents = function () {
         console.log('Slapped!');
         var result = this.ERS.slap(data.id);
         this.socket.emit('slapResult', result);
-        if (result === 'penalty') {
+        if (result.result === 'penalty') {
             console.log('BURN A CARD!');
-        } else if (result !== null) {
+        } else if (result.result !== null) {
             this.render.clearBoard();
         }
         this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id});

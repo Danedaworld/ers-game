@@ -170,4 +170,11 @@ ERS.prototype.slap = function (id) {
     }
 };
 
+ERS.prototype.clearBoard = function () {
+    this.isSlappable = 0;
+    this.isFaceCard = false;
+    this.faceCardPlayer = null;
+    this.numCardsToPlay = 1;
+}
+
 window.ERS = ERS;

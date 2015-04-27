@@ -62,6 +62,7 @@ Main.prototype.setupEvents = function () {
             console.log('BURN A CARD!');
         } else if (result.result !== null) {
             this.render.clearBoard();
+            this.ERS.clearBoard();
         }
         this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id});
     }.bind(this));

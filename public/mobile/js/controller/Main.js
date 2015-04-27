@@ -22,12 +22,12 @@ Main.prototype.setupEvents = function () {
     }.bind(this));
 
     // stupid iPhones...
-    document.ontouchstart = function (e) {
-        e.preventDefault();
-    }
-    document.ontouchmove = function (e) {
-        e.preventDefault();
-    }
+    // document.ontouchstart = function (e) {
+    //     e.preventDefault();
+    // }
+    // document.ontouchmove = function (e) {
+    //     e.preventDefault();
+    // }
 
     // Gesture event handlers (I tried JQuery/Hammer and decided to just write my own custom events)
     var hammer = new Hammer($('#gameCanvas')[0]); 

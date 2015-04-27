@@ -1,6 +1,7 @@
 var Player = function (name, id) {
     this.id = id ? id : this.generateID();
     this.name = name ? name : this.id;
+    this.isPlaying = 1;
     //this.hand = new Hand();
 
 };

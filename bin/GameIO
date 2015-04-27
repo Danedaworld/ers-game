@@ -101,6 +101,7 @@ module.exports = function (server) {
 
         socket.on('noCardsRemaining', function (data) {
             //To-Do
+            io.emit('noCardsRemaining', data);
         });
     });
 };

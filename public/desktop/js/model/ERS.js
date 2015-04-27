@@ -2,6 +2,7 @@ var ERS = function () {
     this.cardPile = []
     this.burnPile = []
     this.playerList = [];
+    this.activePlayers = 0;
     this.currentPlayer = null;
     this.currentPlayerIndex = -1;
     this.numCardsToPlay = 1;
@@ -16,6 +17,7 @@ ERS.prototype.addPlayer = function (name, id) {
     console.log(player);
     if (this.playerList.indexOf(player) === -1) {
         this.playerList.push(player);
+        this.activePlayers++;
     }
 };
 
@@ -111,24 +113,45 @@ ERS.prototype.setStartingPlayer = function () {
 }
 
 ERS.prototype.forceNextPlayer = function () {
+
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
     this.currentPlayer = this.playerList[this.currentPlayerIndex];
+    if (this.currentPlayer.isPlaying == 0) {
+        this.forceNextPlayer();
+    }
 }
 
 ERS.prototype.nextPlayer = function () {
     if (!this.isFaceCard) {
-        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerList.length;
-        this.currentPlayer = this.playerList[this.currentPlayerIndex];
+        this.forceNextPlayer();
         if (this.numCardsToPlay === 0) {
             this.numCardsToPlay = 1; 
         }
     }
+
     return this.currentPlayer;
 }
 
 ERS.prototype.setCurrentPlayer = function (id) {
     this.currentPlayer = this.getPlayerByID(id);
     this.currentPlayerIndex = this.playerList.indexOf(this.currentPlayer);
+}
+
+ERS.prototype.dormantPlayer = function (id) {
+    this.getPlayerByID(id).isPlaying = 0;
+    this.activePlayers--;
+}
+
+ERS.prototype.isGameOver = function () {
+    if (this.activePlayers === 1) {
+        this.gameOver = true;
+        for (var i = 0; i < this.playerList.length; i++) {
+            if (this.playerList[i].isPlaying === 1) {
+                this.gameWinner = this.playerList[i];
+                break;
+            }
+        }
+    }
 }
 
 // Slap the cards on the board

@@ -39,7 +39,11 @@ Main.prototype.setupEvents = function () {
         this.render.playCard(data.card);
         var result = this.ERS.playCard(data.card, data.id);
         if (result) {
-            setTimeout(this.socket.emit('giveCards', result), 500);
+            setTimeout(function () {
+                this.socket.emit('giveCards', result);
+                this.render.clearBoard();
+            }.bind(this), 500);
+            
         }
         this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id}); // the currentPlayer is set to the next player
     }.bind(this));
@@ -61,6 +65,11 @@ Main.prototype.setupEvents = function () {
         }
         this.socket.emit('nextPlayer', {'id': this.ERS.currentPlayer.id});
     }.bind(this));
+
+    this.socket.on('noCardsRemaining', function (data) {
+        this.ERS.dormantPlayer(data.id);
+        this.ERS.checkGameOver();
+    }.bind(this)); 
 
     this.socket.on('render', function (data) {
         this.render.draw();

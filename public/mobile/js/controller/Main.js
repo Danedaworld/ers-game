@@ -6,6 +6,7 @@ var Main = function () {
     this.isSynced = false;
     this.canStart = false;
     this.isMyTurn = false;
+    this.isPlaying = 1;
     this.tapStart = {};
 };
 
@@ -24,7 +25,7 @@ Main.prototype.setupEvents = function () {
     var hammer = new Hammer($('#gameCanvas')[0]); 
     var canvas = $('#gameCanvas')[0];
     canvas.addEventListener('touchend', function (event) {
-        if (this.isMyTurn) {
+        if (this.isMyTurn && this.isPlaying === 1) {
             if (event.changedTouches[0].identifier === this.tapStart.event.targetTouches[0].identifier) {
                 var time = Date.now();
                 var touch = event.changedTouches[0];
@@ -36,6 +37,7 @@ Main.prototype.setupEvents = function () {
                         this.socket.emit('playCard', {'card': card});
                         this.render.draw();
                     } else {
+                        this.isPlaying = 0;
                         this.socket.emit('noCardsRemaining');
                     }
                 }
@@ -46,7 +48,10 @@ Main.prototype.setupEvents = function () {
 
     canvas.addEventListener('touchstart', function (event) {
         console.log(event);
-        if (event.targetTouches.length === 1 && this.isMyTurn) { // this should be a single-finger swipe event
+        // if (this.isPlaying === 0) {
+        //     return;
+        // }
+        if (event.targetTouches.length === 1 && this.isMyTurn && this.isPlaying) { // this should be a single-finger swipe event
             this.tapStart = {'time': Date.now(), 'event': event, 'touch': event.targetTouches[0]};
         }
         if (event.targetTouches.length === 4) { // this should be a four-finger tap

@@ -37,7 +37,7 @@ Render.prototype.playCard = function (card) {
 
 Render.prototype.clearBoard = function () {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    $('#gameCanvas').css('background-color', '#BFB64D');
+    $('#gameCanvas').css('background-color', '#148a2a');
 }
 
 Render.prototype.burnCard = function (card) {
